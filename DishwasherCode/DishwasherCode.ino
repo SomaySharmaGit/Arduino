@@ -2,6 +2,7 @@ int pin1 = 4;
 int pin2 = 3;
 int pin4 = 2;
 int greenLed = 9;
+int redLed = 10;
 
 int buzzerPin = 12;
 int switchPin1 = 5;
@@ -43,7 +44,7 @@ void setup() {
   pinMode(pin1, OUTPUT);
   pinMode(pin2, OUTPUT);
   pinMode(pin4, OUTPUT);
-  pinMode(switchPin, INPUT);
+  pinMode(switchPin1, INPUT);
 
   digitalWrite(pin1,LOW);
   digitalWrite(pin2,LOW);
@@ -205,7 +206,7 @@ void checkSwitch4(){
   if(millis() - debounceTimer4 > debounceDelay){
     if(currentSwitch4State == HIGH && reading == LOW){
       timer4 = millis();
-      function4 = true;
+      function3 = true;
     }
     currentSwitch4State = reading;
   }
@@ -306,13 +307,88 @@ void check1(){
 
     }
 
-   
+    if(timeDiff > 15000){
+      function1 = false;
+    }
 
 
 }
 void check2(){
   long int timeDiff = millis()-timer3;
+
+  if(timeDiff > 0 && timeDiff < 3000){
+    digitalWrite(pin1,LOW);
+    digitalWrite(pin2,LOW);
+    digitalWrite(pin4,HIGH);
+
+    }
+
+  if(timeDiff > 3000 && timeDiff < 6000){
+    digitalWrite(pin1,LOW);
+    digitalWrite(pin2,HIGH);
+    digitalWrite(pin4,HIGH);
+
+    }
+
+  if(timeDiff > 6000){
+    digitalWrite(pin1,LOW);
+    digitalWrite(pin2,LOW);
+    digitalWrite(pin4,LOW);
+
+    function2 = false;
+    }
+
   
+}
+void check3(){
+  long int timeDiff = millis() - timer4;
+
+
+  int fraction = millis() % 1500;
+  int PWM;
+
+  //Red LED
+
+  if(timeDiff > 0 && timeDiff < 1500){
+    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(redLed, PWM);
+  }
+
+  if(timeDiff > 1500 && timeDiff < 3000){
+    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(redLed, 255 - PWM);
+  }
+
+  //Green Led
+
+  if(timeDiff > 3000 && timeDiff < 4500){
+    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(greenLed, PWM);
+  }
+
+  if(timeDiff > 4500 && timeDiff < 6000){
+    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(greenLed, 255 - PWM);
+  }
+
+  //Yellow LED
+
+  if(timeDiff > 6000 && timeDiff < 7500){
+    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(greenLed, PWM);
+    analogWrite(redLed, PWM);
+  }
+
+  if(timeDiff > 7500 && timeDiff < 9000){
+    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(greenLed, 255 - PWM);
+    analogWrite(redLed, 255 - PWM);
+  }
+
+  if(timeDiff > 9000){
+    function3 = false;
+  }
+
 }
 
 

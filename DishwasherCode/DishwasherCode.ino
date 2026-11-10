@@ -57,6 +57,9 @@ void setup() {
 void loop() {
 
   checkSwitch1();
+  checkSwitch2();
+  checkSwitch3();
+  checkSwitch4();
 
   if(startCycle){
     cycle1();
@@ -173,6 +176,7 @@ void checkSwitch2(){
     if(currentSwitch2State == HIGH && reading == LOW){
       timer2 = millis();
       function1 = true;
+      Serial.println("This works");
     }
     currentSwitch2State = reading;
   }
@@ -317,15 +321,15 @@ void check2(){
   long int timeDiff = millis()-timer3;
 
   if(timeDiff > 0 && timeDiff < 3000){
-    digitalWrite(pin1,LOW);
+    digitalWrite(pin1,HIGH);
     digitalWrite(pin2,LOW);
-    digitalWrite(pin4,HIGH);
+    digitalWrite(pin4,LOW);
 
     }
 
   if(timeDiff > 3000 && timeDiff < 6000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,HIGH);
+    digitalWrite(pin1,HIGH);
+    digitalWrite(pin2,LOW);
     digitalWrite(pin4,HIGH);
 
     }
@@ -343,51 +347,71 @@ void check2(){
 void check3(){
   long int timeDiff = millis() - timer4;
 
-
-  int fraction = millis() % 1500;
-  int PWM;
+  int fraction = timeDiff % 1500;
+  int PWM = map(fraction, 0, 1500, 0, 255);
+  
 
   //Red LED
 
   if(timeDiff > 0 && timeDiff < 1500){
-    PWM = map(fraction, 0, 1500, 0, 255);
     analogWrite(redLed, PWM);
   }
 
   if(timeDiff > 1500 && timeDiff < 3000){
-    PWM = map(fraction, 0, 1500, 0, 255);
     analogWrite(redLed, 255 - PWM);
   }
 
-  //Green Led
-
   if(timeDiff > 3000 && timeDiff < 4500){
-    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(redLed, 0);
     analogWrite(greenLed, PWM);
   }
 
   if(timeDiff > 4500 && timeDiff < 6000){
-    PWM = map(fraction, 0, 1500, 0, 255);
     analogWrite(greenLed, 255 - PWM);
   }
-
-  //Yellow LED
 
   if(timeDiff > 6000 && timeDiff < 7500){
-    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(redLed, (int)PWM/15);
     analogWrite(greenLed, PWM);
-    analogWrite(redLed, PWM);
   }
-
+  
   if(timeDiff > 7500 && timeDiff < 9000){
-    PWM = map(fraction, 0, 1500, 0, 255);
+    analogWrite(redLed, (int)(255 - PWM)/15);
     analogWrite(greenLed, 255 - PWM);
-    analogWrite(redLed, 255 - PWM);
   }
 
-  if(timeDiff > 9000){
-    function3 = false;
+  //Green Led
+
+
+  if(timeDiff > 9000 && timeDiff < 10000){
+    analogWrite(redLed, 0);
+    analogWrite(greenLed, 0);
+    alert();
   }
+
+  if(timeDiff > 10000 && timeDiff < 10500){
+    noTone(buzzerPin);
+  }
+
+  if(timeDiff > 10500 && timeDiff < 11500){
+    alert();
+  }
+
+  if(timeDiff > 11500 && timeDiff < 12000){
+    noTone(buzzerPin);
+  }
+
+  if(timeDiff > 12000 && timeDiff < 13000){
+    alert();
+  }
+
+  if(timeDiff > 13000){
+    noTone(buzzerPin);
+      function3 = false;
+  }
+
+
+
 
 }
 

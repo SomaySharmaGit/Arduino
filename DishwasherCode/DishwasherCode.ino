@@ -34,7 +34,7 @@ long int timer2 = 0;
 long int timer3 = 0;
 long int timer4 = 0;
 
-boolean startCycle;
+boolean startCycle1;
 boolean function1;
 boolean function2;
 boolean function3;
@@ -45,6 +45,11 @@ void setup() {
   pinMode(pin2, OUTPUT);
   pinMode(pin4, OUTPUT);
   pinMode(switchPin1, INPUT);
+  pinMode(switchPin2, INPUT);
+  pinMode(switchPin3, INPUT);
+  pinMode(switchPin4, INPUT);
+
+
 
   digitalWrite(pin1,LOW);
   digitalWrite(pin2,LOW);
@@ -61,7 +66,7 @@ void loop() {
   checkSwitch3();
   checkSwitch4();
 
-  if(startCycle){
+  if(startCycle1){
     cycle1();
   } 
 
@@ -82,60 +87,26 @@ void cycle1(){
   long int timeDiff = millis()-timer1;
 
   if(timeDiff < 4000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
-    //function 1
-
-    Serial.println("Function 1");
+    mode(1);
   }
-
   if(timeDiff > 4000 && timeDiff < 10000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,LOW);
-
-    //function 3
-
-    Serial.println("Function 3");
+    mode(3);
   }
-  
   if(timeDiff > 10000 && timeDiff < 12000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
-    //function 1
-    Serial.println("Function 1");
+    mode(1);
   }
-
   if(timeDiff > 12000 && timeDiff < 13000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,HIGH);
-
-    //function 7
-    Serial.println("Function 7");
+    mode(7);
   }
-
   if(timeDiff > 13000 && timeDiff < 15000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
+    mode(0);
     alert();
     analogWrite(greenLed, 0);
-
-    Serial.println("Function 0");
-
   } 
-
   if(timeDiff > 15000){
-    startCycle = false;
+    startCycle1 = false;
     noTone(buzzerPin);
   }
-
   if(timeDiff < 13000){
     blinkLed();
   }
@@ -158,7 +129,7 @@ void checkSwitch1(){
   if(millis() - debounceTimer1 > debounceDelay){
     if(currentSwitch1State == HIGH && reading == LOW){
       timer1 = millis();
-      startCycle = true;
+      startCycle1 = true;
     }
     currentSwitch1State = reading;
   }
@@ -221,96 +192,50 @@ void check1(){
     long int timeDiff = millis()-timer2;
     
     if(timeDiff > 0 && timeDiff < 1000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
+    mode(0);
     }
     if(timeDiff > 1000 && timeDiff < 2000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
+    mode(1);
     }
     if(timeDiff > 2000 && timeDiff < 3000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,LOW);
-
+    mode(2);
     }
     if(timeDiff > 3000 && timeDiff < 4000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,LOW);
-
+    mode(3);
     }
     if(timeDiff > 4000 && timeDiff < 5000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,HIGH);
-
+    mode(4)
     }
     if(timeDiff > 5000 && timeDiff < 6000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,HIGH);
-
+    mode(5);
     }
     if(timeDiff > 6000 && timeDiff < 7000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,HIGH);
-
+    mode(6);
     }
     if(timeDiff > 7000 && timeDiff < 8000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,HIGH);
-
+    mode(7);
     }
     if(timeDiff > 8000 && timeDiff < 9000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,HIGH);
-
+    mode(6);
     }
     if(timeDiff > 9000 && timeDiff < 10000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,HIGH);
-
+    mode(5);
     }
     if(timeDiff > 10000 && timeDiff < 11000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,HIGH);
-
+    mode(4);
     }
     if(timeDiff > 11000 && timeDiff < 12000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,LOW);
-
+    mode(3);
     }
     if(timeDiff > 12000 && timeDiff < 13000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,HIGH);
-    digitalWrite(pin4,LOW);
-
+    mode(2);
     }
     if(timeDiff > 13000 && timeDiff < 14000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
+    mode(1);
     }
     if(timeDiff > 14000 && timeDiff < 15000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
+    mode(0);
     }
-
     if(timeDiff > 15000){
       function1 = false;
     }
@@ -321,24 +246,15 @@ void check2(){
   long int timeDiff = millis()-timer3;
 
   if(timeDiff > 0 && timeDiff < 3000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
+    mode(1);
     }
 
   if(timeDiff > 3000 && timeDiff < 6000){
-    digitalWrite(pin1,HIGH);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,HIGH);
-
+    mode(5);
     }
 
   if(timeDiff > 6000){
-    digitalWrite(pin1,LOW);
-    digitalWrite(pin2,LOW);
-    digitalWrite(pin4,LOW);
-
+    mode(0);
     function2 = false;
     }
 
@@ -413,6 +329,62 @@ void check3(){
 
 
 
+}
+
+void mode(int number){
+  switch(number){
+    case 0:
+      digitalWrite(pin1,LOW);
+      digitalWrite(pin2,LOW);
+      digitalWrite(pin4,LOW);
+    break;
+    case 1:
+      digitalWrite(pin1,HIGH);
+      digitalWrite(pin2,LOW);
+      digitalWrite(pin4,LOW);
+    break;
+
+    case 2:
+      digitalWrite(pin1,LOW);
+      digitalWrite(pin2,HIGH);
+      digitalWrite(pin4,LOW);
+    break;
+
+    case 3:
+      digitalWrite(pin1,HIGH);
+      digitalWrite(pin2,HIGH);
+      digitalWrite(pin4,LOW);
+    break;
+
+    case 4:
+      digitalWrite(pin1,LOW);
+      digitalWrite(pin2,LOW);
+      digitalWrite(pin4,HIGH);
+    break;
+
+    case 5:
+      digitalWrite(pin1,HIGH);
+      digitalWrite(pin2,LOW);
+      digitalWrite(pin4,HIGH);
+    break;
+
+    case 6:
+      digitalWrite(pin1,LOW);
+      digitalWrite(pin2,HIGH);
+      digitalWrite(pin4,HIGH);
+    break;
+
+    case 7:
+      digitalWrite(pin1,HIGH);
+      digitalWrite(pin2,HIGH);
+      digitalWrite(pin4,HIGH);
+    break;
+
+    default:
+      digitalWrite(pin1,LOW);
+      digitalWrite(pin2,LOW);
+      digitalWrite(pin4,LOW);
+  }
 }
 
 

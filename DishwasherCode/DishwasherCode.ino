@@ -1,14 +1,18 @@
 int pin1 = 4;
 int pin2 = 3;
 int pin4 = 2;
+
 int greenLed = 9;
 int redLed = 10;
-
 int buzzerPin = 12;
+
 int switchPin1 = 5;
 int switchPin2 = 6;
 int switchPin3 = 7;
 int switchPin4 = 8;
+int switchPin5 = 11;
+int switchPin6 = 12; 
+
 
 int currentSwitch1State = LOW;
 int previousSwitch1State = LOW;
@@ -26,6 +30,14 @@ int currentSwitch4State = LOW;
 int previousSwitch4State = LOW;
 long int debounceTimer4 = 0;
 
+int currentSwitch5State = LOW;
+int previousSwitch5State = LOW;
+long int debounceTimer5 = 0;
+
+int currentSwitch6State = LOW;
+int previousSwitch6State = LOW;
+long int debounceTimer6 = 0;
+
 
 long int debounceDelay = 10;
 
@@ -33,8 +45,12 @@ long int timer1 = 0;
 long int timer2 = 0;
 long int timer3 = 0;
 long int timer4 = 0;
+long int timer5 = 0;
+long int timer6 = 0;
 
 boolean startCycle1;
+boolean startCycle2;
+boolean startCycle3;
 boolean function1;
 boolean function2;
 boolean function3;
@@ -44,16 +60,17 @@ void setup() {
   pinMode(pin1, OUTPUT);
   pinMode(pin2, OUTPUT);
   pinMode(pin4, OUTPUT);
-  pinMode(switchPin1, INPUT);
-  pinMode(switchPin2, INPUT);
-  pinMode(switchPin3, INPUT);
-  pinMode(switchPin4, INPUT);
-
-
 
   digitalWrite(pin1,LOW);
   digitalWrite(pin2,LOW);
   digitalWrite(pin4,LOW);
+
+  pinMode(switchPin1, INPUT);
+  pinMode(switchPin2, INPUT);
+  pinMode(switchPin3, INPUT);
+  pinMode(switchPin4, INPUT);
+  
+
 
   Serial.begin(9600);
 
@@ -65,10 +82,19 @@ void loop() {
   checkSwitch2();
   checkSwitch3();
   checkSwitch4();
+  checkSwitch5();
+  checkSwitch6();
 
   if(startCycle1){
     cycle1();
   } 
+  if(startCycle2){
+    cycle2();
+  } 
+  if(startCycle3){
+    cycle3();
+  } 
+
 
   if(function1){
     check1();
@@ -111,6 +137,48 @@ void cycle1(){
     blinkLed();
   }
 }
+
+
+void cycle2(){
+  long int timeDiff = millis()-timer5;
+
+  if(timeDiff < 3000){
+    mode(1);
+  }
+  if(timeDiff > 3000 && timeDiff < 8000){
+    mode(4);
+  }
+  if(timeDiff > 8000 && timeDiff < 11000){
+    mode(1);
+  }
+  if(timeDiff > 11000 && timeDiff < 14000){
+    mode(7);
+  }
+  if(timeDiff < 14000){
+    mode(0);
+  }
+}
+
+void cycle3(){
+  long int timeDiff = millis()-timer6;
+
+  if(timeDiff < 3000){
+    mode(2);
+  }
+  if(timeDiff > 3000 && timeDiff < 10000){
+    mode(5);
+  }
+  if(timeDiff > 10000 && timeDiff < 15000){
+    mode(2);
+  }
+  if(timeDiff > 15000 && timeDiff < 18000){
+    mode(6);
+  }
+  if(timeDiff > 18000){
+    mode(0);
+  }
+}
+
 void alert(){
   tone(buzzerPin, 1440);
 }
@@ -188,6 +256,42 @@ void checkSwitch4(){
 
   previousSwitch4State = reading;
 }
+void checkSwitch5(){
+  int reading = digitalRead(switchPin5);
+
+  if(reading != previousSwitch5State){
+    debounceTimer5 = millis();
+  }
+
+  if(millis() - debounceTimer5 > debounceDelay){
+    if(currentSwitch5State == HIGH && reading == LOW){
+      timer5 = millis();
+      startCycle2 = true;
+    }
+    currentSwitch5State = reading;
+  }
+
+  previousSwitch5State = reading;
+}
+void checkSwitch6(){
+  int reading = digitalRead(switchPin6);
+
+  if(reading != previousSwitch6State){
+    debounceTimer6 = millis();
+  }
+
+  if(millis() - debounceTimer6 > debounceDelay){
+    if(currentSwitch6State == HIGH && reading == LOW){
+      timer6 = millis();
+      startCycle3 = true;
+    }
+    currentSwitch6State = reading;
+  }
+
+  previousSwitch6State = reading;
+}
+
+
 void check1(){
     long int timeDiff = millis()-timer2;
     

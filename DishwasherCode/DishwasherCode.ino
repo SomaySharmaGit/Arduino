@@ -54,10 +54,21 @@ long int timer6 = 0;
 boolean startCycle1;
 boolean startCycle2;
 boolean startCycle3;
+
 boolean function1;
 boolean function2;
 boolean function3;
 
+boolean startSong = false;
+
+int noteFrequencies[] = {
+  659, 494, 523, 587, 523, 494, 440, 440, 523, 659, // E5, B4, C5, D5, C5, B4, A4, A4, C5, E5
+  587, 523, 494, 523, 587, 659, 523, 440, 440        // D5, C5, B4, C5, D5, E5, C5, A4, A4
+};
+int noteDurations[] = {
+  250, 125, 125, 250, 125, 125, 250, 125, 125, 250, 
+  125, 125, 250, 125, 125, 250, 250, 250, 250
+};
 
 void setup() {
   pinMode(pin1, OUTPUT);
@@ -88,27 +99,29 @@ void loop() {
   checkSwitch5();
   checkSwitch6();
 
+
   if(startCycle1){
     cycle1();
-  } 
-  if(startCycle2){
+  } else if(startCycle2){
     cycle2();
-  } 
-  if(startCycle3){
+  } else if(startCycle3){
     cycle3();
-  } 
-
-
-  if(function1){
+  } else if(function1){
     check1();
-  } 
-  if(function2){
+  } else if(function2){
     check2();
-  } 
-  if(function3){
+  } else if(function3){
     check3();
-  } 
-  
+  } else {
+    digitalWrite(greenLed, 0);
+    digitalWrite(redLed,0);
+    if(startSong){
+      song();
+    }
+  }
+
+
+ 
 }
 
 void cycle1(){
@@ -127,20 +140,16 @@ void cycle1(){
   if(timeDiff > 12000 && timeDiff < 13000){
     mode(7);
   }
-  if(timeDiff > 13000 && timeDiff < 15000){
+  if(timeDiff > 13000){
     mode(0);
-    alert();
-    analogWrite(greenLed, 0);
-  } 
-  if(timeDiff > 15000){
     startCycle1 = false;
-    noTone(buzzerPin);
-  }
-  if(timeDiff < 13000){
-    blinkLed();
-  }
-}
+    startSong = true;
+  } 
 
+
+  pulseLed(timeDiff, 1.0, 0.0);
+
+}
 
 void cycle2(){
   long int timeDiff = millis()-timer5;
@@ -159,7 +168,12 @@ void cycle2(){
   }
   if(timeDiff > 14000){
     mode(0);
+    startCycle2 = false;
+    startSong = true;
   }
+
+  pulseLed(timeDiff, 1.0, 0.25);
+
 }
 
 void cycle3(){
@@ -179,9 +193,12 @@ void cycle3(){
   }
   if(timeDiff > 18000){
     mode(0);
+    startCycle3 = false;
+    startSong = true;
   }
-}
 
+  pulseLed(timeDiff, 0.0, 1.0);
+}
 void alert(){
   tone(buzzerPin, 1440);
 }
@@ -293,8 +310,6 @@ void checkSwitch6(){
 
   previousSwitch6State = reading;
 }
-
-
 void check1(){
     long int timeDiff = millis()-timer2;
     
@@ -437,7 +452,6 @@ void check3(){
 
 
 }
-
 void mode(int number){
   switch(number){
     case 0:
@@ -493,6 +507,33 @@ void mode(int number){
       digitalWrite(pin4,LOW);
   }
 }
+void pulseLed(int timer, float greenFraction, float redFraction){
+  
+  int fraction = timer % 2000;
+  int PWM = map(fraction, 0, 2000, 0, 255);
+
+  analogWrite(greenLed, (int)((255-PWM)*greenFraction));
+  analogWrite(redLed, (int)((255-PWM)*redFraction));
+
+
+}
+
+void song(){
+
+  int arrayLength = sizeof(noteFrequencies) / sizeof(noteFrequencies[0]);
+
+  for(int i = 0; i < arrayLength; i++){
+    int note = noteFrequencies[i];
+    int duration = noteDurations[i];
+    tone(buzzerPin, note);
+    delay(duration);
+    delay(80);
+  }
+
+  noTone(buzzerPin);
+  startSong = false;
+}
+
 
 
 

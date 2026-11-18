@@ -6,12 +6,15 @@ int greenLed = 9;
 int redLed = 10;
 int buzzerPin = 12;
 
-int switchPin1 = 5;
-int switchPin2 = 6;
-int switchPin3 = 7;
-int switchPin4 = 8;
-int switchPin5 = 11;
-int switchPin6 = 12; 
+int switchPin1 = 11;
+int switchPin5 = 6;
+int switchPin6 = 7; 
+
+
+int switchPin2 = 8;
+int switchPin3 = A1;
+int switchPin4 = A0;
+
 
 
 int currentSwitch1State = LOW;
@@ -69,9 +72,9 @@ void setup() {
   pinMode(switchPin2, INPUT);
   pinMode(switchPin3, INPUT);
   pinMode(switchPin4, INPUT);
+  pinMode(switchPin5, INPUT);
+  pinMode(switchPin6, INPUT);
   
-
-
   Serial.begin(9600);
 
 }
@@ -154,7 +157,7 @@ void cycle2(){
   if(timeDiff > 11000 && timeDiff < 14000){
     mode(7);
   }
-  if(timeDiff < 14000){
+  if(timeDiff > 14000){
     mode(0);
   }
 }
@@ -308,7 +311,7 @@ void check1(){
     mode(3);
     }
     if(timeDiff > 4000 && timeDiff < 5000){
-    mode(4)
+    mode(4);
     }
     if(timeDiff > 5000 && timeDiff < 6000){
     mode(5);

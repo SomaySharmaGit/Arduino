@@ -1,28 +1,29 @@
 #include <TM1637Display.h>
+#include <Servo.h>
 
 const int CLK = A2; 
 const int DIO = A3;
-
-TM1637Display display(CLK, DIO);
+const int servoPin = 10;
 
 int pin1 = 4;
 int pin2 = 3;
 int pin4 = 2;
 
-int greenLed = 9;
-int redLed = 10;
+int greenLed = 5;
+int redLed = 6;
 int buzzerPin = 12;
 
 int switchPin1 = 11;
-int switchPin5 = 6;
-int switchPin6 = 7; 
+int switchPin5 = 7;
+int switchPin6 = 8; 
 
 
-int switchPin2 = 8;
+int switchPin2 = 9;
 int switchPin3 = A1;
 int switchPin4 = A0;
 
-
+TM1637Display display(CLK, DIO);
+Servo myServo;
 
 int currentSwitch1State = LOW;
 int previousSwitch1State = LOW;
@@ -108,6 +109,7 @@ void setup() {
   pinMode(switchPin6, INPUT);
 
   display.setBrightness(0x0f);
+  myServo.attach(servoPin);
 
   Serial.begin(9600);
 
@@ -501,6 +503,7 @@ void mode(int number, int timeDigit) {
       d0[0] = SYM_OFF;
       d1[0] = SYM_OFF;
       d2[0] = SYM_COLD;
+      myServo.write(0);   // Closed
     break;
 
     case 1:
@@ -509,6 +512,7 @@ void mode(int number, int timeDigit) {
       digitalWrite(pin4, LOW);
       d1[0] = SYM_COLD;  
       d2[0] = SYM_FILL;
+      myServo.write(60);  // Cold water
     break;
 
     case 2:
@@ -517,6 +521,7 @@ void mode(int number, int timeDigit) {
       digitalWrite(pin4, LOW);
       d1[0] = SYM_HOT;   
       d2[0] = SYM_FILL;
+      myServo.write(120); // Hot water
     break;
 
     case 3:
@@ -525,6 +530,7 @@ void mode(int number, int timeDigit) {
       digitalWrite(pin4, LOW);
       d1[0] = SYM_COLD;   
       d2[0] = SYM_COLD;
+      myServo.write(0);   // Closed
     break;
 
     case 4:
@@ -533,6 +539,7 @@ void mode(int number, int timeDigit) {
       digitalWrite(pin4, HIGH);
       d1[0] = SYM_COLD;    
       d2[0] = SYM_COLD;
+      myServo.write(0);   // Closed
     break;
 
     case 5:
@@ -541,6 +548,7 @@ void mode(int number, int timeDigit) {
       digitalWrite(pin4, HIGH);
       d1[0] = SYM_HOT;   
       d2[0] = SYM_COLD;
+      myServo.write(0);   // Closed
     break;
 
     case 6:
@@ -549,6 +557,7 @@ void mode(int number, int timeDigit) {
       digitalWrite(pin4, HIGH);
       d1[0] = SYM_HOT;   
       d2[0] = SYM_DRAIN;
+      myServo.write(180); // Drain
     break;
 
     case 7:
@@ -557,6 +566,7 @@ void mode(int number, int timeDigit) {
       digitalWrite(pin4, HIGH);
       d1[0] = SYM_OFF;   
       d2[0] = SYM_DRAIN;
+      myServo.write(180); // Drain
     break;
 
     default:
@@ -566,6 +576,7 @@ void mode(int number, int timeDigit) {
       d0[0] = SYM_OFF;  
       d1[0] = SYM_OFF;  
       d2[0] = SYM_COLD;
+      myServo.write(0);   // Closed
   }
 
   display.setSegments(d0, 1, 0);

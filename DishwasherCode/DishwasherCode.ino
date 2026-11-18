@@ -1,3 +1,10 @@
+#include <TM1637Display.h>
+
+const int CLK = A2; 
+const int DIO = A3;
+
+TM1637Display display(CLK, DIO);
+
 int pin1 = 4;
 int pin2 = 3;
 int pin4 = 2;
@@ -70,6 +77,20 @@ int noteDurations[] = {
   125, 125, 250, 125, 125, 250, 250, 250, 250
 };
 
+const uint8_t SYM_OFF    = 0x00;                                  // Blank
+const uint8_t SYM_RINSE  = SEG_E | SEG_G;                         // 'r'
+const uint8_t SYM_SHORT  = SEG_A | SEG_F | SEG_G | SEG_C | SEG_D; // 'S'
+const uint8_t SYM_NORMAL = SEG_B | SEG_C | SEG_E | SEG_F;           // '| |' (Parallel lines)
+const uint8_t SYM_LONG   = SEG_D | SEG_E | SEG_F;                 // 'L'
+const uint8_t SYM_DRY    = SEG_B | SEG_C | SEG_D | SEG_E | SEG_G; // 'd'
+const uint8_t SYM_HOT    = SEG_B | SEG_C | SEG_E | SEG_F | SEG_G; // 'H'
+const uint8_t SYM_COLD   = SEG_A | SEG_D | SEG_E | SEG_F;         // 'C'
+const uint8_t SYM_FILL   = SEG_A | SEG_F | SEG_G | SEG_E;         // 'F'
+const uint8_t SYM_DRAIN  = SEG_A | SEG_D | SEG_E | SEG_F | SEG_G; // 'E'
+
+uint8_t currentCycleSymbol = 0x00;
+
+
 void setup() {
   pinMode(pin1, OUTPUT);
   pinMode(pin2, OUTPUT);
@@ -85,8 +106,12 @@ void setup() {
   pinMode(switchPin4, INPUT);
   pinMode(switchPin5, INPUT);
   pinMode(switchPin6, INPUT);
-  
+
+  display.setBrightness(0x0f);
+
   Serial.begin(9600);
+
+
 
 }
 
@@ -128,71 +153,83 @@ void cycle1(){
 
   long int timeDiff = millis()-timer1;
 
+  currentCycleSymbol = SYM_SHORT;
+
+  int timeDigit = map(timeDiff, 0, 13000, 0, 9);
+  if (timeDigit > 9) timeDigit = 9;
+
   if(timeDiff < 4000){
-    mode(1);
+    mode(1, timeDigit);
   }
   if(timeDiff > 4000 && timeDiff < 10000){
-    mode(3);
+    mode(3, timeDigit);
   }
   if(timeDiff > 10000 && timeDiff < 12000){
-    mode(1);
+    mode(1, timeDigit);
   }
   if(timeDiff > 12000 && timeDiff < 13000){
-    mode(7);
+    mode(7, timeDigit);
   }
   if(timeDiff > 13000){
-    mode(0);
+    mode(0, 0);
     startCycle1 = false;
     startSong = true;
   } 
 
-
   pulseLed(timeDiff, 1.0, 0.0);
-
 }
 
 void cycle2(){
   long int timeDiff = millis()-timer5;
 
+  currentCycleSymbol = SYM_NORMAL;
+
+  int timeDigit = map(timeDiff, 0, 14000, 0, 9);
+  if (timeDigit > 9) timeDigit = 9;
+
   if(timeDiff < 3000){
-    mode(1);
+    mode(1, timeDigit);
   }
   if(timeDiff > 3000 && timeDiff < 8000){
-    mode(4);
+    mode(4, timeDigit);
   }
   if(timeDiff > 8000 && timeDiff < 11000){
-    mode(1);
+    mode(1, timeDigit);
   }
   if(timeDiff > 11000 && timeDiff < 14000){
-    mode(7);
+    mode(7, timeDigit);
   }
   if(timeDiff > 14000){
-    mode(0);
+    mode(0, 0);
     startCycle2 = false;
     startSong = true;
   }
 
   pulseLed(timeDiff, 1.0, 0.25);
-
 }
 
 void cycle3(){
   long int timeDiff = millis()-timer6;
 
+  currentCycleSymbol = SYM_LONG;
+
+  int timeDigit = map(timeDiff, 0, 18000, 0, 9);
+  if (timeDigit > 9) timeDigit = 9;
+
   if(timeDiff < 3000){
-    mode(2);
+    mode(2, timeDigit);
   }
   if(timeDiff > 3000 && timeDiff < 10000){
-    mode(5);
+    mode(5, timeDigit);
   }
   if(timeDiff > 10000 && timeDiff < 15000){
-    mode(2);
+    mode(2, timeDigit);
   }
   if(timeDiff > 15000 && timeDiff < 18000){
-    mode(6);
+    mode(6, timeDigit);
   }
   if(timeDiff > 18000){
-    mode(0);
+    mode(0, 0);
     startCycle3 = false;
     startSong = true;
   }
@@ -314,73 +351,70 @@ void check1(){
     long int timeDiff = millis()-timer2;
     
     if(timeDiff > 0 && timeDiff < 1000){
-    mode(0);
+    mode(0, 0);
     }
     if(timeDiff > 1000 && timeDiff < 2000){
-    mode(1);
+    mode(1, 0);
     }
     if(timeDiff > 2000 && timeDiff < 3000){
-    mode(2);
+    mode(2, 0);
     }
     if(timeDiff > 3000 && timeDiff < 4000){
-    mode(3);
+    mode(3, 0);
     }
     if(timeDiff > 4000 && timeDiff < 5000){
-    mode(4);
+    mode(4, 0);
     }
     if(timeDiff > 5000 && timeDiff < 6000){
-    mode(5);
+    mode(5, 0);
     }
     if(timeDiff > 6000 && timeDiff < 7000){
-    mode(6);
+    mode(6, 0);
     }
     if(timeDiff > 7000 && timeDiff < 8000){
-    mode(7);
+    mode(7, 0);
     }
     if(timeDiff > 8000 && timeDiff < 9000){
-    mode(6);
+    mode(6, 0);
     }
     if(timeDiff > 9000 && timeDiff < 10000){
-    mode(5);
+    mode(5, 0);
     }
     if(timeDiff > 10000 && timeDiff < 11000){
-    mode(4);
+    mode(4, 0);
     }
     if(timeDiff > 11000 && timeDiff < 12000){
-    mode(3);
+    mode(3, 0);
     }
     if(timeDiff > 12000 && timeDiff < 13000){
-    mode(2);
+    mode(2, 0);
     }
     if(timeDiff > 13000 && timeDiff < 14000){
-    mode(1);
+    mode(1, 0);
     }
     if(timeDiff > 14000 && timeDiff < 15000){
-    mode(0);
+    mode(0, 0);
     }
     if(timeDiff > 15000){
       function1 = false;
     }
-
-
 }
+
 void check2(){
   long int timeDiff = millis()-timer3;
 
   if(timeDiff > 0 && timeDiff < 3000){
-    mode(1);
+    mode(1, 0);
     }
 
   if(timeDiff > 3000 && timeDiff < 6000){
-    mode(5);
+    mode(5, 0);
     }
 
   if(timeDiff > 6000){
-    mode(0);
+    mode(0, 0);
     function2 = false;
     }
-
-  
 }
 void check3(){
   long int timeDiff = millis() - timer4;
@@ -452,60 +486,93 @@ void check3(){
 
 
 }
-void mode(int number){
+void mode(int number, int timeDigit) {
+  uint8_t d0[1];
+  uint8_t d1[1];
+  uint8_t d2[1];
+
+  d0[0] = currentCycleSymbol;
+
   switch(number){
     case 0:
-      digitalWrite(pin1,LOW);
-      digitalWrite(pin2,LOW);
-      digitalWrite(pin4,LOW);
+      digitalWrite(pin1, LOW);
+      digitalWrite(pin2, LOW);
+      digitalWrite(pin4, LOW);
+      d0[0] = SYM_OFF;
+      d1[0] = SYM_OFF;
+      d2[0] = SYM_COLD;
     break;
+
     case 1:
-      digitalWrite(pin1,HIGH);
-      digitalWrite(pin2,LOW);
-      digitalWrite(pin4,LOW);
+      digitalWrite(pin1, HIGH);
+      digitalWrite(pin2, LOW);
+      digitalWrite(pin4, LOW);
+      d1[0] = SYM_COLD;  
+      d2[0] = SYM_FILL;
     break;
 
     case 2:
-      digitalWrite(pin1,LOW);
-      digitalWrite(pin2,HIGH);
-      digitalWrite(pin4,LOW);
+      digitalWrite(pin1, LOW);
+      digitalWrite(pin2, HIGH);
+      digitalWrite(pin4, LOW);
+      d1[0] = SYM_HOT;   
+      d2[0] = SYM_FILL;
     break;
 
     case 3:
-      digitalWrite(pin1,HIGH);
-      digitalWrite(pin2,HIGH);
-      digitalWrite(pin4,LOW);
+      digitalWrite(pin1, HIGH);
+      digitalWrite(pin2, HIGH);
+      digitalWrite(pin4, LOW);
+      d1[0] = SYM_COLD;   
+      d2[0] = SYM_COLD;
     break;
 
     case 4:
-      digitalWrite(pin1,LOW);
-      digitalWrite(pin2,LOW);
-      digitalWrite(pin4,HIGH);
+      digitalWrite(pin1, LOW);
+      digitalWrite(pin2, LOW);
+      digitalWrite(pin4, HIGH);
+      d1[0] = SYM_COLD;    
+      d2[0] = SYM_COLD;
     break;
 
     case 5:
-      digitalWrite(pin1,HIGH);
-      digitalWrite(pin2,LOW);
-      digitalWrite(pin4,HIGH);
+      digitalWrite(pin1, HIGH);
+      digitalWrite(pin2, LOW);
+      digitalWrite(pin4, HIGH);
+      d1[0] = SYM_HOT;   
+      d2[0] = SYM_COLD;
     break;
 
     case 6:
-      digitalWrite(pin1,LOW);
-      digitalWrite(pin2,HIGH);
-      digitalWrite(pin4,HIGH);
+      digitalWrite(pin1, LOW);
+      digitalWrite(pin2, HIGH);
+      digitalWrite(pin4, HIGH);
+      d1[0] = SYM_HOT;   
+      d2[0] = SYM_DRAIN;
     break;
 
     case 7:
-      digitalWrite(pin1,HIGH);
-      digitalWrite(pin2,HIGH);
-      digitalWrite(pin4,HIGH);
+      digitalWrite(pin1, HIGH);
+      digitalWrite(pin2, HIGH);
+      digitalWrite(pin4, HIGH);
+      d1[0] = SYM_OFF;   
+      d2[0] = SYM_DRAIN;
     break;
 
     default:
-      digitalWrite(pin1,LOW);
-      digitalWrite(pin2,LOW);
-      digitalWrite(pin4,LOW);
+      digitalWrite(pin1, LOW);
+      digitalWrite(pin2, LOW);
+      digitalWrite(pin4, LOW);
+      d0[0] = SYM_OFF;  
+      d1[0] = SYM_OFF;  
+      d2[0] = SYM_COLD;
   }
+
+  display.setSegments(d0, 1, 0);
+  display.setSegments(d1, 1, 1);
+  display.setSegments(d2, 1, 2);
+
+  display.showNumberDec(timeDigit, false, 1, 3);
 }
 void pulseLed(int timer, float greenFraction, float redFraction){
   
